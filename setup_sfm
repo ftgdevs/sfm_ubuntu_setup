@@ -41,6 +41,12 @@ cp resque.yml.example resque.yml
 cd ..
 echo "==> done..."
 
+# add key to github
+echo -e "\n=> IF YOU SET A ROOT PASSWORD FOR MYSQL"
+echo -e "\n=> YOU SHOULD NOW MODIFY ~/sfmdev/sfmconfig/database.yml"
+cat ~/.ssh/id_rsa.pub
+read -p "Press [Enter] key when completed..."
+
 # install gem dependencies
 source ~/.bashrc
 source ~/.bash_profile
