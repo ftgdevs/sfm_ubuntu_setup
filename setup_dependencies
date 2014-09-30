@@ -1,0 +1,52 @@
+#!/bin/bash
+
+#test if aptitude exists and default to using that if possible
+if command -v aptitude >/dev/null 2>&1 ; then
+  pm="aptitude"
+else
+  pm="apt-get"
+fi
+echo -e "\nUsing $pm for package installation\n"
+
+# Install build tools
+log_file='setup_log.txt'
+# Install build tools
+echo -e "\n=> Installing build tools..."
+sudo $pm -y install \
+  wget \
+  autoconf \
+  automake \
+  bison \
+  build-essential \
+  clang \
+  curl \
+  libxslt1.1 \
+  libssl-dev \
+  libxslt1-dev \
+  libxml2 \
+  libxml2-dev \
+  libffi-dev \
+  libyaml-dev \
+  libxslt-dev \
+  libc6-dev \
+  libreadline-dev \
+  libcurl4-openssl-dev \
+  libtool \
+  openssl \
+  zlib1g \
+  zlib1g-dev
+echo "==> done..."
+
+mysql_pass=''
+# to cause apt-get to autofill the mysql server password
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password password '$mysql_pass''
+sudo debconf-set-selections <<< 'mysql-server mysql-server/root_password_again password '$mysql_pass''
+
+echo -e "\n=> Installing libs needed for sqlite and mysql..."
+sudo $pm -y install \
+  mysql-server \
+  libsqlite3-0 \
+  sqlite3 \
+  libsqlite3-dev \
+  libmysqlclient-dev
+echo "==> done..."

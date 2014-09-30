@@ -1,0 +1,73 @@
+#!/bin/bash
+
+#test if aptitude exists and default to using that if possible
+if command -v aptitude >/dev/null 2>&1 ; then
+  pm="aptitude"
+else
+  pm="apt-get"
+fi
+echo -e "\nUsing $pm for package installation\n"
+
+# Install Imagemagick
+echo -e "\n=> Installing ImageMagick tools..."
+sudo $pm -y install \
+  imagemagick \
+  libmagickcore-dev \
+  libmagickwand-dev \
+  libgdbm-dev \
+  libncurses5-dev \
+  libffi-dev
+echo "==> done..."
+
+# Install libqt, default jre and redis
+echo -e "\n=> Installing SFM Specific tools..."
+sudo $pm -y install \
+  libqt4-dev \
+  default-jre \
+  redis-server
+echo "==> done..."
+
+# install right version of ghostscript
+ghostscript="ghostscript-9.14"
+echo -e "\n=> SFM PDF generation requires ghostscript 9.14 -- building from source"
+echo -e "\n     -- getting source"
+wget http://downloads.ghostscript.com/public/$ghostscript.tar.gz
+echo -e "\n     -- unpacking source"
+tar -zxvf $ghostscript.tar.gz
+cd $ghostscript
+echo -e "\n     -- configure, make, and install"
+configure
+make 
+sudo make install
+echo -e "\n     -- cleanup"
+cd ..
+rm -rf $ghostscript
+rm $ghostscript.tar.gz
+echo "==> done..."
+
+# install rvm
+echo -e "\n=> Installing Ruby Version Manager (RVM)"
+curl -L https://get.rvm.io | bash -s stable
+source ~/.rvm/scripts/rvm
+echo "source ~/.rvm/scripts/rvm" >> ~/.bashrc
+echo "==> done..."
+
+# install ruby 1.8.7
+echo -e "\n=> Installing Ruby 1.9.3-p327"
+rvm install ruby-1.9.3-p327
+echo "==> done..."
+
+# downgrade rubygems
+echo -e "\n=> Downgrading RubyGems to 1.8.29"
+rvm use ruby-1.9.3-p327@global
+gem update --system 1.8.29
+echo "==> done..."
+
+# install bash-it
+echo -e "\n=> Install bash-it"
+git clone https://github.com/revans/bash-it.git ~/.bash_it
+~/.bash_it/install.sh
+echo "source ~/.bash_profile" >> ~/.bashrc
+source ~/.bashrc
+echo "==> done..."
+

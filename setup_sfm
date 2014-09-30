@@ -1,0 +1,60 @@
+#!/bin/bash
+
+# set git global config
+echo -e "\n=> Configure global git "
+git config --global color.ui true
+echo -n "Enter your name and press [ENTER]: "
+read name
+git config --global user.name "$name"
+echo -n "Enter your email and press [ENTER]: "
+read email
+git config --global user.email "$email"
+echo "==> done..."
+
+# generate an SSH key for git access
+echo -e "\n=> Generate SSH Key"
+ssh-keygen -t rsa -C "$email" -N "" -f ~/.ssh/id_rsa
+echo "==> done..."
+
+# add key to github
+echo -e "\n=> Copy the following SSH key and add it to your github account."
+cat ~/.ssh/id_rsa.pub
+read -p "Press [Enter] key to continue..."
+
+ruby_version='ruby-1.9.3-p327'
+ruby_gemset='sfm'
+# checkout project repo
+echo -e "\n=> Checking out the SFM project repo from github"
+git clone git@github.com:ftgdevs/sfm.git
+# configure rvm
+touch sfm/.ruby-version
+echo "$ruby_version" >> sfm/.ruby-version
+touch sfm/.ruby-gemset
+echo "$ruby_gemset" >> sfm/.ruby-gemset
+# copy all *.yml.example files to *.yml in config directory
+cd sfm/config
+cp database.yml.example database.yml
+cp json_persistence.yml.example json_persistence.yml
+cp newrelic.yml.example newrelic.yml
+cp sunspot.yml.example sunspot.yml
+cp resque.yml.example resque.yml
+cd ..
+echo "==> done..."
+
+# install gem dependencies
+source ~/.bashrc
+source ~/.bash_profile
+echo -e "\n=> Loading project specific RubyGems"
+rvm use $ruby_version@$ruby_gemset
+bundle install
+echo "==> done..."
+
+echo -e "\n=> Creating and polulating development database"
+rake db:create:all
+rake db:schema:load
+rake sunspot:solr:start
+rake db:seed_test_data
+rake db:test:prepare
+echo "==> done..."
+
+
