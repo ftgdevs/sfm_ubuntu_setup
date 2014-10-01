@@ -16,5 +16,13 @@ cd sfm_dev
 # execute script to load development environment
 ./setup_environment
 
+NOTE: The install script for bash-it will also prompt you asking if you use Jekyll. 
+This is to set up the .jekyllconfig file, which stores info necessary to use the Jekyll plugin.
+
+Also it will ask which aliases and plugins you want to activate.. for now answer none..
+see https://github.com/revans/bash-it for more info 
+
 # execute script to checkout and configure application
 ./setup_sfm
+
+open new terminal window or source ~/.bashrc to finalize environment changes
